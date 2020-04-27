@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Status manager</title>
+    <meta name="description" content="Manage the status">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="all,follow">
+    <meta name="theme-color" content="#22252a">
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+    <!-- Font Awesome CSS-->
+    <link rel="stylesheet" href="/vendor/font-awesome/css/font-awesome.min.css">
+    <!-- Custom Font Icons CSS-->
+    <link rel="stylesheet" href="/css/font.css">
+    <!-- Google fonts - Muli-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:300,400,700">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="/css/style.default.css" id="theme-stylesheet">
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" href="/css/custom.css">
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    <!-- Tweaks for older IEs-->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+
+</head>
+
+<body>
+    <header class="header">
+        <%- include('partials/headbar'); %>
+    </header>
+
+    <div class="d-flex align-items-stretch">
+        <!-- Sidebar Navigation-->
+        <nav id="sidebar">
+            <!-- Sidebar Header-->
+            <div class="sidebar-header d-flex align-items-center">
+
+            </div>
+            <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
+            <ul class="list-unstyled">
+                <li>
+                    <a href="/dashboard"> <i class="icon-home"></i>Dashboard </a>
+                </li>
+                <li>
+                    <a href="#exampledropdownDropdown" aria-expanded="false" data-toggle="collapse"><i class="fa fa-list" aria-hidden="true"></i>Lists </a>
+                    <ul id="exampledropdownDropdown" class="collapse list-unstyled ">
+
+                        <li><a href="/dashboard/manage/ignoreList/"><i class="fa fa-star" aria-hidden="true"></i>Ignore</a></li>
+                        <li><a href="/dashboard/manage/deleteList/"><i class="fa fa-trash-o" aria-hidden="true"></i>Delete</a></li>
+
+                    </ul>
+                </li>
+                <li>
+                    <a href="/dashboard/manage/status"><i class="fa fa-play" aria-hidden="true"></i>Status </a>
+                </li>
+                <li class="active">
+                    <a href="/dashboard/installer"><i class="fa fa-cloud-download" aria-hidden="true"></i>Installer </a>
+                </li>
+            </ul>
+
+        </nav>
+        <!-- Sidebar Navigation end-->
+
+
+
+
+        <div class="page-content">
+            <div class="page-header">
+                <div class="container-fluid">
+                    <h2 class="h5 no-margin-bottom">Install launcher's files</h2>
+                </div>
+            </div>
+
+
+            <!--  section list ignore list-->
+            <section class="no-padding-bottom">
+                <div class="container-fluid">
+
+                    <div class="checklist-block block">
+                        <div class="title"><strong>Packs installer</strong></div>
+
+                        <%if (dllist !== "") {%>
+
+
+                            <select name="type" onchange="selectType(this.value)" class="form-control mb-3 mb-3">
+                            <option>none</option>
+                            <% let types = dllist.packs.map(type => type.name)%> 
+
+
+                            <script>
+                                  let gameVersions = []
+                                  let selectedObject = "";
+                                  let customVersions = []
+                                let rawtypes = "<%= types %>"
+                                 var types = rawtypes.split(",");
+                                 console.log("<%= types%>")
+                           
+                            </script>
+    
+                     <% types.forEach(type => {%> 
+                      <option><%= type %></option>
+                          <%  }); %>         
+                        </select>
+
+
+                            <% dllist.packs.forEach(gameType => { %>
+
+                                <select style="display:none;" id="<%= gameType.name %>" onchange='selectVersion("<%= gameType.name%>",this.value)' name="versionSelector" class="form-control mb-3 mb-3">
+                                <option>none</option>
+                                <% gameType.versions.forEach(version => {%>
+
+                                  
+                                    <option><%= version.gameVersion %></option>
+                                    
+                           
+                                <%   }); %>
+                            </select>
+
+
+
+
+                                <% gameType.versions.forEach(version => {%>
+                                    <script>
+                                        console.log("<%= gameType.name %>.<%= version.gameVersion %>")
+                                    </script>
+                                    <select style="display:none;" id="<%= gameType.name %>.<%= version.gameVersion %>" name="customSelector" onchange='selectCustomVersion("<%= gameType.name %>","<%= version.gameVersion%>", this.value)' class="form-control mb-3 mb-3">
+                                    <option>none</option>
+                                    <script>gameVersions.push("<%= gameType.name %>.<%= version.gameVersion %>")
+                                    console.log("<%= version.gameVersion %>")
+                                    </script>
+
+
+                                <%  version.customVersions.forEach(customVersion => {%>
+
+                                        <script>customVersions.push("<%= gameType.name %>.<%= customVersion.version %>") 
+                                       
+                                        </script>
+                                  
+                                        <option value="<%= JSON.stringify(customVersion) %>"> <%= customVersion.version %></option>
+
+
+                                    <%  }); %>
+                                </select>
+
+                                    <%   }); %>
+
+                                        <%  }); %>
+
+
+
+
+
+
+                                            <script>
+                                                function selectType(value) {
+                                                    let selectedType = value
+                                                    types.forEach(type => {
+                                                        document.getElementById(type).style.display = "none";
+                                                    });
+                                                    gameVersions.forEach(type => {
+                                                        document.getElementById(type).style.display = "none";
+                                                    });
+
+                                                    if (value == "none") return
+                                                    let versionSelector = document.getElementById(value)
+                                                    versionSelector.style.display = "block";
+                                                }
+
+                                                function selectVersion(gameType, value) {
+                                                    gameVersions.forEach(type => {
+                                                        document.getElementById(type).style.display = "none";
+                                                    });
+                                                    if (value == "none") return
+                                                    let versionSelector = document.getElementById(gameType + "." + value)
+                                                    versionSelector.style.display = "block";
+                                                }
+
+                                                function selectCustomVersion(gameType, gameVersion, value) {
+                                                    console.log(Object.values(value))
+                                                    selectedObject = value
+                                                    document.getElementById("content").value = selectedObject
+                                                    if (value == "none") return
+                                                }
+                                            </script>
+
+
+                                            <%}%>
+                                                <form action="/dashboard/install" method="post" class="form-inline">
+
+                                                    <input type="hidden" id="content" name="content" />
+                                                    <input type="submit" value="Submit" class="btn btn-primary">
+
+                                                </form>
+                    </div>
+                    ⚠ This will delete your file folder, please backup it before clicking submit
+                </div>
+            </section>
+
+
+
+            <%- include('partials/footer'); %>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+    <!-- JavaScript files-->
+
+    <%- include('partials/js'); %>
+
+
+
+
+
+</html>
