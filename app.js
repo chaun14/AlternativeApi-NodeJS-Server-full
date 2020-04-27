@@ -226,8 +226,19 @@ app.get('/logout', (req, res) => {
 
 /* ################################# Init ################################# */
 sql.getSettings((err, settings) => {
-    status.setStatus(settings[0].launcher_status)
-    if (debug) utils.logDebug("[" + "INIT".cyan + "] " + "Launcher status set as " + settings[0].launcher_status)
+    if (settings[0] == undefined) {
+        sql.initSettings((err, settings))
+
+        sql.getSettings((err, settings) => {
+
+            status.setStatus(settings[0].launcher_status)
+            if (debug) utils.logDebug("[" + "INIT".cyan + "] " + "Launcher status set as " + settings[0].launcher_status)
+        })
+
+    } else {
+        status.setStatus(settings[0].launcher_status)
+        if (debug) utils.logDebug("[" + "INIT".cyan + "] " + "Launcher status set as " + settings[0].launcher_status)
+    }
 
 })
 

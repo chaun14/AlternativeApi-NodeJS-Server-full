@@ -51,6 +51,19 @@ async function getSettings(callback) {
     })
 }
 
+async function initSettings(callback) {
+    let query = `INSERT INTO settings (id, launcher_status) VALUES (1, 'Ok');`
+
+    await db.query(query, function(err, newSettings, fields) {
+        if (err) console.log(err.message);
+
+        if (debug) {
+            utils.logDebugMysql("initSettings " + query)
+        }
+        //   callback(err, newSettings);
+    })
+}
+
 async function setNewStatus(status, callback) {
     let setNewStatus = `UPDATE settings SET launcher_status = ${SqlString.escape(status)};`;
 
@@ -159,4 +172,84 @@ async function removeDeletedItem(item, callback) {
 /* ################################# End deleteList ################################# */
 
 
-module.exports = { newRequest, getTodayStats, getSettings, getIgnoreList, addIgnoredItem, removeIgnoredItem, getDeleteList, addDeletedItem, removeDeletedItem, setNewStatus }
+
+let createDeleteList = `
+--
+-- Structure de la table deleteList
+--
+
+CREATE TABLE IF NOT EXISTS deleteList (
+  id int(255) NOT NULL AUTO_INCREMENT,
+  path varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  updatedAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  createdAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY path (path)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;`;
+
+connection.query(createDeleteList, function(err, results, fields) {
+    if (err) {
+        console.log(err.message);
+    }
+});
+
+let createIgnoreList = `
+--
+-- Structure de la table ignoreList
+--
+
+CREATE TABLE IF NOT EXISTS ignoreList (
+  id int(255) NOT NULL AUTO_INCREMENT,
+  path varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'path to ignored file',
+  updatedAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  createdAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY path (path)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+`;
+
+connection.query(createIgnoreList, function(err, results, fields) {
+    if (err) {
+        console.log(err.message);
+    }
+});
+
+
+let createRequest = `
+--
+-- Structure de la table requests
+--
+
+CREATE TABLE IF NOT EXISTS requests (
+  id int(255) NOT NULL AUTO_INCREMENT,
+  type varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_croatian_ci NOT NULL,
+  calc_time int(255) NOT NULL,
+  date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+`;
+
+connection.query(createRequest, function(err, results, fields) {
+    if (err) {
+        console.log(err.message);
+    }
+});
+
+
+
+let createSettings = `
+CREATE TABLE IF NOT EXISTS settings (
+    id int(11) NOT NULL AUTO_INCREMENT,
+    launcher_status varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT 'Ok',
+    PRIMARY KEY (id)
+  ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+  
+`;
+
+connection.query(createSettings, function(err, results, fields) {
+    if (err) {
+        console.log(err.message);
+    }
+});
+
+module.exports = { newRequest, getTodayStats, getSettings, initSettings, getIgnoreList, addIgnoredItem, removeIgnoredItem, getDeleteList, addDeletedItem, removeDeletedItem, setNewStatus }

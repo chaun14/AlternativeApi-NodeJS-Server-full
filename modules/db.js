@@ -33,37 +33,7 @@ function handleDisconnect() {
 }
 handleDisconnect();
 
-/*
 
 
-let guildTable = `create table if not exists settings(
-        guildId varchar(255) primary key not null,
-        prefix varchar(255),
-        autoRole varchar(255)
-    )`;
-
-connection.query(guildTable, function (err, results, fields) {
-  if (err) {
-    console.log(err.message);
-  }
-});
-
-
-
-let usernameTable = `create table if not exists userNameLogger(
-  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  userId varchar(255) not null,
-  oldUsername varchar(255),
-  newUsername varchar(255),
-  updateDate TIMESTAMP,
-  reason varchar(255)
-)DEFAULT CHARSET=utf8mb4`;
-
-connection.query(usernameTable, function (err, results, fields) {
-if (err) {
-console.log(err.message);
-}
-});
-*/
 
 module.exports = connection
