@@ -29,13 +29,14 @@ router.get('/', function(req, res) {
             let deletedItemNumber = list.getDeleteList().size
 
             let timeAverage;
-            if (result) {
+            if (!results) {
+                timeAverage = None;
+            } else {
+
                 let calc_times = results.map(result => result.calc_time); // extract times from query results
                 timeAverage = numAverage(calc_times); // get the average
                 timeAverage = timeAverage / 1000; // ms to s
                 timeAverage = timeAverage.toFixed(3) // round
-            } else {
-                timeAverage = None;
             }
 
             res.render("dashboard", { user: req.session.passport, message: "", messageType: "success", todayStats: results, timeAverage: timeAverage, ignoredItemNumber: ignoredItemNumber, deletedItemNumber: deletedItemNumber })
