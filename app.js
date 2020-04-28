@@ -8,33 +8,33 @@ console.log(" ╚═════════════════════
 
 
 const bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser')
-var path = require('path');
-var morgan = require('morgan');
+let cookieParser = require('cookie-parser')
+let path = require('path');
+let morgan = require('morgan');
 const fileUpload = require('express-fileupload');
 
-var bcrypt = require('bcryptjs');
+let bcrypt = require('bcryptjs');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy
 const expressSession = require('express-session')
 const flash = require('flash')
 const helmet = require('helmet')
 const express = require('express')
-var SelfReloadJSON = require('self-reload-json');
+let SelfReloadJSON = require('self-reload-json');
 
 let list = require("./modules/listManager.js")
 let status = require("./modules/statusManager.js")
 let sql = require('./modules/sql.js')
 let utils = require('./modules/utils.js')
 let db = require('./modules/db.js')
-var config = new SelfReloadJSON('./config.json');
+let config = new SelfReloadJSON('./config.json');
 let debug = config.debug;
 
 
 
 const app = express();
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
+let http = require('http').createServer(app);
+let io = require('socket.io')(http);
 
 
 // les middleware
@@ -66,14 +66,14 @@ app.set('view engine', 'ejs');
 
 
 
-var hash = bcrypt.hashSync('jesuisuntest', 8);
+let hash = bcrypt.hashSync('jesuisuntest', 8);
 console.log(hash)
 
-var dashboardRouter = require('./routes/dashboard');
+let dashboardRouter = require('./routes/dashboard');
 app.use('/dashboard', dashboardRouter);
 
 
-var rootRouter = require('./routes/index');
+let rootRouter = require('./routes/index');
 app.use('/', rootRouter);
 
 
@@ -196,7 +196,7 @@ app.post('/register', (req, res) => {
     if (!config.passwordHash == "") return res.render("login", { message: "You already have a password", messageType: "error", hasPass: true })
     if (req.body.password !== req.body.passwordrepeat) return res.render("login", { message: "Passwords doesn't match", messageType: "error", hasPass: false })
 
-    var hash = bcrypt.hashSync(req.body.password, 8);
+    let hash = bcrypt.hashSync(req.body.password, 8);
     config.passwordHash = hash
     config.save()
 

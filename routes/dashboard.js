@@ -1,6 +1,6 @@
-var express = require('express');
+let express = require('express');
 const fs = require('fs')
-var router = express.Router();
+let router = express.Router();
 const passport = require('passport');
 let list = require("../modules/listManager.js")
 let status = require("../modules/statusManager.js")
@@ -8,13 +8,13 @@ let sql = require("../modules/sql.js")
 let utils = require("../modules/utils.js")
 const fetch = require('node-fetch');
 const unzip = require('node-unzip-2');
-var rimraf = require("rimraf");
+let rimraf = require("rimraf");
 
 let config = require("../config.json")
 let debug = config.debug
 
-var request = require('request');
-var progress = require('request-progress');
+let request = require('request');
+let progress = require('request-progress');
 
 
 
@@ -28,11 +28,16 @@ router.get('/', function(req, res) {
             let ignoredItemNumber = list.getIgnoreList().size
             let deletedItemNumber = list.getDeleteList().size
 
-            let calc_times = results.map(result => result.calc_time); // extract times from query results
+            let timeAverage;
+            if (result) {
+                let calc_times = results.map(result => result.calc_time); // extract times from query results
+                timeAverage = numAverage(calc_times); // get the average
+                timeAverage = timeAverage / 1000; // ms to s
+                timeAverage = timeAverage.toFixed(3) // round
+            } else {
+                timeAverage = None;
+            }
 
-            let timeAverage = numAverage(calc_times); // get the average
-            timeAverage = timeAverage / 1000; // ms to s
-            timeAverage = timeAverage.toFixed(3) // round
             res.render("dashboard", { user: req.session.passport, message: "", messageType: "success", todayStats: results, timeAverage: timeAverage, ignoredItemNumber: ignoredItemNumber, deletedItemNumber: deletedItemNumber })
         })
 
@@ -100,7 +105,7 @@ router.post('/install', async function(req, res) {
         console.log(response)
         res.render("download", { message: "", messageType: "error", files: response.install })
 
-        var dir = './files';
+        let dir = './files';
         setTimeout(function() {
 
             if (fs.existsSync(dir)) {
@@ -601,7 +606,7 @@ router.post('/manage/deletelist/import', function(req, res) {
 module.exports = router;
 
 function numAverage(a) {
-    var b = a.length,
+    let b = a.length,
         c = 0,
         i;
     for (i = 0; i < b; i++) {
