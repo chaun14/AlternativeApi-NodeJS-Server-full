@@ -10,7 +10,7 @@ async function newRequest(type, time, callback) {
     const newRequest = `INSERT INTO requests(type, calc_time) VALUES(${SqlString.escape(type)}, '${time}');`;
 
     await db.query(newRequest, function(err, result, fields = null) {
-        if (err) throw new Error("Une erreur est survenue lors de l'injection en base de données. Raison : "+ err.message);
+        if (err) throw new Error("Une erreur est survenue lors de l'injection en base de données. Raison : " + err.message);
 
         if (debug) {
             utils.logDebugMysql("newRequest " + newRequest + "\n" + JSON.stringify(result))
@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS deleteList (
   UNIQUE KEY path (path)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;`;
 
-await connection.query(createDeleteList, function(err, results, fields) {
+connection.query(createDeleteList, function(err, results, fields) {
     if (err) {
         console.log(err.message);
     }
@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS ignoreList (
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 `;
 
-await connection.query(createIgnoreList, function(err, results, fields) {
+connection.query(createIgnoreList, function(err, results, fields) {
     if (err) {
         console.log(err.message);
     }
@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS requests (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 `;
 
-await connection.query(createRequest, function(err, results, fields) {
+connection.query(createRequest, function(err, results, fields) {
     if (err) {
         console.log(err.message);
     }
@@ -245,7 +245,7 @@ CREATE TABLE IF NOT EXISTS settings (
   
 `;
 
-await connection.query(createSettings, function(err, results, fields) {
+connection.query(createSettings, function(err, results, fields) {
     if (err) {
         console.log(err.message);
     }

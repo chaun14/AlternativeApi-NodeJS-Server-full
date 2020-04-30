@@ -1,10 +1,12 @@
 const mysql = require('mysql');
 const config = require("../config.json")
 
-async function mysqlConnect() {
+//async function mysqlConnect() {
+function mysqlConnect() {
     console.log("Connexion à la bdd")
-    connection = await mysql.createConnection(config.database); // Recreate the connection, since the old one cannot be reused.
-    await connection.connect(function onConnect(err) { // The server is either down
+    connection = /*await */ mysql.createConnection(config.database); // Recreate the connection, since the old one cannot be reused.
+    /*await*/
+    connection.connect(function onConnect(err) { // The server is either down
 
         if (err) { // or restarting (takes a while sometimes).
             console.log('error when connecting to db:', err);
@@ -24,11 +26,15 @@ async function mysqlConnect() {
     });
 }
 mysqlConnect()
-.then( () => {
-    console.log('connection achieved successfully')
-})
-.catch(error => {
-    console.log('connection refused. Reason : ' + error);
-});
+    /*
+    If async implementation
+        .then(() => {
+            console.log('connection achieved successfully')
+
+        })
+        .catch(error => {
+            console.log('connection refused. Reason : ' + error);
+        });
+    */
 
 module.exports = connection
