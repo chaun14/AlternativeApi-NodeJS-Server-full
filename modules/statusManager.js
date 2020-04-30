@@ -1,4 +1,4 @@
-const status = "Ok";
+let status = "";
 const sql = require('./sql.js')
 
 
