@@ -1,22 +1,20 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
 const md5File = require('md5-file')
 const recursiveReadSync = require('recursive-readdir-sync')
 const fs = require('fs')
 
-let utils = require("../modules/utils.js")
-let list = require("../modules/listManager.js")
-let status = require("../modules/statusManager.js")
-let sql = require("../modules/sql.js")
+const utils = require("../modules/utils.js")
+const list = require("../modules/listManager.js")
+const status = require("../modules/statusManager.js")
+const sql = require("../modules/sql.js")
 
 const config = require('../config.json')
-let debug = config.debug;
-
-
+const debug = config.debug;
 
 // quand un launcher get la liste de téléchargement
-router.get('/files', function(req, res) {
+router.get('/files', function (req, res) {
 
     // déclare quelques variables de fonctionnement
     let files;
@@ -32,10 +30,10 @@ router.get('/files', function(req, res) {
 
     } catch (err) { // on le laisse pas passer les erreur méchantes
         if (err.errno === 34) {
-            res.send('Veuillez créer un dossier nommé files');
+            res.status(400).send('Veuillez créer un dossier nommé files');
         } else {
             //something unrelated went wrong, rethrow
-            throw err;
+            throw new Error("Something went wrong. Reason : " + err);
         }
     }
 
@@ -43,7 +41,7 @@ router.get('/files', function(req, res) {
 
 
     // on énumère les fichiers
-    for (var i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
 
         // on récup le hash md5 du fichier
         const hash = md5File.sync("./" + items[i])
@@ -69,7 +67,7 @@ router.get('/files', function(req, res) {
     }
     // on get le timestamp final
     let finalTime = Date.now()
-        // second log informatif
+    // second log informatif
     console.log("[INFO] ".brightBlue + `Listage de `.yellow + `${files.length}`.rainbow + ` fichiers en `.yellow + (finalTime - initialTime) + "ms pour ".yellow + (req.connection.remoteAddress).magenta)
 
     // debug only
@@ -82,23 +80,22 @@ router.get('/files', function(req, res) {
 
     // on finalise nos balise et on envoie notre objet xml généré
     res.send('<?xml version="1.0"?>' + "<xml>" + "<ListBucketResult>" + xml + "</ListBucketResult>" + "</xml>")
-    sql.newRequest("getfiles", finalTime - initialTime, (err, result) => {})
-})
+    sql.newRequest("getfiles", finalTime - initialTime, (err, result) => { })
+});
 
 // pour ne pas afficher une page vide moche
-router.get('/', function(req, res) {
-
+router.get('/', function (req, res) {
     res.send(`Trxyy's alternative lib download server by <a href="https://chaun14.fr/">chaun14</a><br><a href="/login">Login</a>`)
-})
+});
 
 // gestion de l'activation du launcher
-router.get('/status.cfg', function(req, res) {
+router.get('/status.cfg', function (req, res) {
     res.set('Content-Type', 'text/cfg');
     res.send(status.getStatus())
-})
+});
 
 
-router.get('/ignore.cfg', function(req, res) {
+router.get('/ignore.cfg', function (req, res) {
     ignoreList = list.getIgnoreList()
     let builder;
     for (let item of ignoreList) {
@@ -108,16 +105,13 @@ router.get('/ignore.cfg', function(req, res) {
         } else {
             builder = item + "\n"
         }
-
-
-
     }
     res.set('Content-Type', 'text/cfg');
     res.send(builder)
-})
+});
 
 
-router.get('/delete.cfg', function(req, res) {
+router.get('/delete.cfg', function (req, res) {
     deleteList = list.getDeleteList()
     let builder;
     for (let item of deleteList) {
@@ -127,12 +121,9 @@ router.get('/delete.cfg', function(req, res) {
         } else {
             builder = item + "\n"
         }
-
-
-
     }
     res.set('Content-Type', 'text/cfg');
     res.send(builder)
-})
+});
 
 module.exports = router;

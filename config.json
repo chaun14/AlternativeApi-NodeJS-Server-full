@@ -5,8 +5,9 @@
     "database": {
         "host": "localhost",
         "port": "3306",
-        "name": "",
-        "username": "",
-        "password": ""
+        "database": "",
+        "user": "",
+        "password": "",
+        "charset": "utf8mb4_bin"
     }
 }
