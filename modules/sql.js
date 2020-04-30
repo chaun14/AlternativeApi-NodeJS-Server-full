@@ -1,17 +1,16 @@
 const db = require('./db.js');
-var SqlString = require('sqlstring');
+const SqlString = require('sqlstring');
 const config = require('../config.json')
 const utils = require('./utils.js')
-let debug = config.debug;
 
-
+const debug = config.debug;
 
 /* ################################# Stats ################################# */
 async function newRequest(type, time, callback) {
-    let newRequest = `INSERT INTO requests(type, calc_time) VALUES(${SqlString.escape(type)}, '${time}');`;
+    const newRequest = `INSERT INTO requests(type, calc_time) VALUES(${SqlString.escape(type)}, '${time}');`;
 
-    await db.query(newRequest, function(err, result, fields) {
-        if (err) console.log(err.message);
+    await db.query(newRequest, function(err, result, fields = null) {
+        if (err) throw new Error("Une erreur est survenue lors de l'injection en base de données. Raison : "+ err.message);
 
         if (debug) {
             utils.logDebugMysql("newRequest " + newRequest + "\n" + JSON.stringify(result))
@@ -23,8 +22,8 @@ async function newRequest(type, time, callback) {
 async function getTodayStats(callback) {
     let getTodayStats = `SELECT * FROM requests WHERE DATE(date) = CURDATE();`;
 
-    await db.query(getTodayStats, function(err, results, fields) {
-        if (err) console.log(err.message);
+    await db.query(getTodayStats, function(err, results, fields = null) {
+        if (err) throw new Error("Une erreur est survenue lors de l'injection en base de données. Raison : " + err.message);
 
         if (debug) {
             utils.logDebugMysql("getTodayStats " + getTodayStats + "\n" + JSON.stringify(results))
@@ -39,10 +38,10 @@ async function getTodayStats(callback) {
 
 /* ################################# Status ################################# */
 async function getSettings(callback) {
-    let getSettings = `SELECT * FROM settings;`;
+    const getSettings = `SELECT * FROM settings;`;
 
-    await db.query(getSettings, function(err, settings, fields) {
-        if (err) console.log(err.message);
+    await db.query(getSettings, function(err, settings, fields = null) {
+        if (err) throw new Error("Une erreur est survenue lors de l'injection en base de données. Raison : " + err.message);
 
         if (debug) {
             utils.logDebugMysql("guildSetting " + getSettings + "\n" + JSON.stringify(settings))
@@ -51,11 +50,11 @@ async function getSettings(callback) {
     })
 }
 
-async function initSettings(callback) {
-    let query = `INSERT INTO settings (id, launcher_status) VALUES (1, 'Ok');`
+async function initSettings(callback = null) {
+    const query = `INSERT INTO settings (id, launcher_status) VALUES (1, 'Ok');`
 
-    await db.query(query, function(err, newSettings, fields) {
-        if (err) console.log(err.message);
+    await db.query(query, function(err, newSettings = null, fields = null) {
+        if (err) throw new Error("Une erreur est survenue lors de l'injection en base de données. Raison : " + err.message);
 
         if (debug) {
             utils.logDebugMysql("initSettings " + query)
@@ -65,10 +64,10 @@ async function initSettings(callback) {
 }
 
 async function setNewStatus(status, callback) {
-    let setNewStatus = `UPDATE settings SET launcher_status = ${SqlString.escape(status)};`;
+    const setNewStatus = `UPDATE settings SET launcher_status = ${SqlString.escape(status)};`;
 
-    await db.query(setNewStatus, function(err, newStatus, fields) {
-        if (err) console.log(err.message);
+    await db.query(setNewStatus, function(err, newStatus, fields = null) {
+        if (err) throw new Error("Une erreur est survenue lors de l'injection en base de données. Raison : " + err.message);
 
         if (debug) {
             utils.logDebugMysql("setNewStatus " + setNewStatus)
@@ -83,10 +82,10 @@ async function setNewStatus(status, callback) {
 
 /* ################################# IgnoreList ################################# */
 async function getIgnoreList(callback) {
-    let getIgnoreList = `SELECT * FROM ignoreList;`;
+    const getIgnoreList = `SELECT * FROM ignoreList;`;
 
-    await db.query(getIgnoreList, function(err, ignoreList, fields) {
-        if (err) console.log(err.message);
+    await db.query(getIgnoreList, function(err, ignoreList, fields = null) {
+        if (err) throw new Error("Une erreur est survenue lors de l'injection en base de données. Raison : " + err.message);
 
         if (debug) {
             utils.logDebugMysql("getIgnoreList " + getIgnoreList + "\n" + JSON.stringify(ignoreList))
@@ -96,10 +95,10 @@ async function getIgnoreList(callback) {
 }
 
 async function addIgnoredItem(item, callback) {
-    let addIgnoredItem = `INSERT INTO ignoreList(path) VALUES(${SqlString.escape(item)});`;
+    const addIgnoredItem = `INSERT INTO ignoreList(path) VALUES(${SqlString.escape(item)});`;
 
     await db.query(addIgnoredItem, function(err, result, fields) {
-        if (err) console.log(err.message);
+        if (err) throw new Error("Une erreur est survenue lors de l'injection en base de données. Raison : " + err.message);
 
         if (debug) {
             utils.logDebugMysql("addIgnoredItem " + addIgnoredItem + "\n" + JSON.stringify(result))
@@ -110,10 +109,10 @@ async function addIgnoredItem(item, callback) {
 
 async function removeIgnoredItem(item, callback) {
 
-    let removeIgnoredItem = `DELETE FROM ignoreList WHERE ignoreList.path = ${SqlString.escape(item)};`;
+    const removeIgnoredItem = `DELETE FROM ignoreList WHERE ignoreList.path = ${SqlString.escape(item)};`;
 
-    await db.query(removeIgnoredItem, function(err, result, fields) {
-        if (err) console.log(err.message);
+    await db.query(removeIgnoredItem, function(err, result, fields = null) {
+        if (err) throw new Error("Une erreur est survenue lors de l'injection en base de données. Raison : " + err.message);
 
         if (debug) {
             utils.logDebugMysql("removeIgnoredItem " + removeIgnoredItem + "\n" + JSON.stringify(result))
@@ -131,10 +130,10 @@ async function removeIgnoredItem(item, callback) {
 /* ################################# deleteList ################################# */
 
 async function getDeleteList(callback) {
-    let getDeleteList = `SELECT * FROM deleteList;`;
+    const getDeleteList = `SELECT * FROM deleteList;`;
 
     await db.query(getDeleteList, function(err, deleteList, fields) {
-        if (err) console.log(err.message);
+        if (err) throw new Error("Une erreur est survenue lors de l'injection en base de données. Raison : " + err.message);
 
         if (debug) {
             utils.logDebugMysql("getDeleteList " + getDeleteList + "\n" + JSON.stringify(deleteList))
@@ -144,10 +143,10 @@ async function getDeleteList(callback) {
 }
 
 async function addDeletedItem(item, callback) {
-    let addDeletedItem = `INSERT INTO deleteList(path) VALUES(${SqlString.escape(item)});`;
+    const addDeletedItem = `INSERT INTO deleteList(path) VALUES(${SqlString.escape(item)});`;
 
     await db.query(addDeletedItem, function(err, result, fields) {
-        if (err) console.log(err.message);
+        if (err) throw new Error("Une erreur est survenue lors de l'injection en base de données. Raison : " + err.message);
 
         if (debug) {
             utils.logDebugMysql("addDeletedItem " + addDeletedItem + "\n" + JSON.stringify(result))
@@ -158,10 +157,10 @@ async function addDeletedItem(item, callback) {
 
 async function removeDeletedItem(item, callback) {
 
-    let removeDeletedItem = `DELETE FROM deleteList WHERE deleteList.path = ${SqlString.escape(item)};`;
+    const removeDeletedItem = `DELETE FROM deleteList WHERE deleteList.path = ${SqlString.escape(item)};`;
 
     await db.query(removeDeletedItem, function(err, result, fields) {
-        if (err) console.log(err.message);
+        if (err) throw new Error("Une erreur est survenue lors de l'injection en base de données. Raison : " + err.message);
 
         if (debug) {
             utils.logDebugMysql("removeDeletedItem " + removeDeletedItem + "\n" + JSON.stringify(result))
@@ -173,7 +172,7 @@ async function removeDeletedItem(item, callback) {
 
 
 
-let createDeleteList = `
+const createDeleteList = `
 --
 -- Structure de la table deleteList
 --
@@ -187,13 +186,13 @@ CREATE TABLE IF NOT EXISTS deleteList (
   UNIQUE KEY path (path)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;`;
 
-connection.query(createDeleteList, function(err, results, fields) {
+await connection.query(createDeleteList, function(err, results, fields) {
     if (err) {
         console.log(err.message);
     }
 });
 
-let createIgnoreList = `
+const createIgnoreList = `
 --
 -- Structure de la table ignoreList
 --
@@ -208,14 +207,14 @@ CREATE TABLE IF NOT EXISTS ignoreList (
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 `;
 
-connection.query(createIgnoreList, function(err, results, fields) {
+await connection.query(createIgnoreList, function(err, results, fields) {
     if (err) {
         console.log(err.message);
     }
 });
 
 
-let createRequest = `
+const createRequest = `
 --
 -- Structure de la table requests
 --
@@ -229,7 +228,7 @@ CREATE TABLE IF NOT EXISTS requests (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 `;
 
-connection.query(createRequest, function(err, results, fields) {
+await connection.query(createRequest, function(err, results, fields) {
     if (err) {
         console.log(err.message);
     }
@@ -237,7 +236,7 @@ connection.query(createRequest, function(err, results, fields) {
 
 
 
-let createSettings = `
+const createSettings = `
 CREATE TABLE IF NOT EXISTS settings (
     id int(11) NOT NULL AUTO_INCREMENT,
     launcher_status varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT 'Ok',
@@ -246,7 +245,7 @@ CREATE TABLE IF NOT EXISTS settings (
   
 `;
 
-connection.query(createSettings, function(err, results, fields) {
+await connection.query(createSettings, function(err, results, fields) {
     if (err) {
         console.log(err.message);
     }
