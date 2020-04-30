@@ -180,7 +180,7 @@ let createDeleteList = `
 
 CREATE TABLE IF NOT EXISTS deleteList (
   id int(255) NOT NULL AUTO_INCREMENT,
-  path varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  path varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'path to deleted file',
   updatedAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   createdAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -200,7 +200,7 @@ let createIgnoreList = `
 
 CREATE TABLE IF NOT EXISTS ignoreList (
   id int(255) NOT NULL AUTO_INCREMENT,
-  path varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'path to ignored file',
+  path varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'path to ignored file',
   updatedAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   createdAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
