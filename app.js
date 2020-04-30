@@ -20,20 +20,21 @@ const expressSession = require('express-session')
 const flash = require('flash')
 const helmet = require('helmet')
 const express = require('express')
-const SelfReloadJSON = require('self-reload-json');
+let SelfReloadJSON = require('self-reload-json');
 
-const list = require("./modules/listManager.js")
-const status = require("./modules/statusManager.js")
-const sql = require('./modules/sql.js')
-const utils = require('./modules/utils.js')
-const db = require('./modules/db.js')
-const config = new SelfReloadJSON('./config.json');
-const debug = config.debug;
+let list = require("./modules/listManager.js")
+let status = require("./modules/statusManager.js")
+let sql = require('./modules/sql.js')
+let utils = require('./modules/utils.js')
+let db = require('./modules/db.js')
+let config = new SelfReloadJSON('./config.json');
+let debug = config.debug;
+
 
 
 const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+let http = require('http').createServer(app);
+let io = require('socket.io')(http);
 
 
 // les middleware
@@ -44,17 +45,15 @@ app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: '/tmp/'
 }));
-
 app.use(cookieParser(config.secret))
 app.use(bodyParser.json());
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use(expressSession({
     secret: config.secret,
     resave: false,
     saveUninitialized: false
 }));
-
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
@@ -67,12 +66,15 @@ app.set('view engine', 'ejs');
 
 
 
-const hash = bcrypt.hashSync('jesuisuntest', 8);
+let hash = bcrypt.hashSync('jesuisuntest', 8);
 console.log(hash)
 
-app.use('/dashboard',  require('./routes/dashboard'));
+let dashboardRouter = require('./routes/dashboard');
+app.use('/dashboard', dashboardRouter);
 
-app.use('/', require('./routes/index'));
+
+let rootRouter = require('./routes/index');
+app.use('/', rootRouter);
 
 
 
@@ -121,6 +123,7 @@ passport.use(new LocalStrategy(
             })
 
         } else {
+
             if (debug) utils.logDebug("[" + "AUTH".red + "] " + "Je ne trouve pas " + username)
             return done("user not found")
 
@@ -206,12 +209,14 @@ app.get('/logout', (req, res) => {
         res.redirect('/');
     } else {
 
+
         if (debug) utils.logDebug("Déco de " + req.session.passport.user.username)
 
         req.session.destroy(function(err) {
             res.redirect('/'); //Inside a callback… bulletproof!
         });
     }
+
 });
 /* ################################# End Auth stuff ################################# */
 
@@ -222,7 +227,7 @@ app.get('/logout', (req, res) => {
 /* ################################# Init ################################# */
 sql.getSettings((err, settings) => {
     if (settings[0] == undefined) {
-        sql.initSettings((err, settings));
+        sql.initSettings((err, settings))
 
         sql.getSettings((err, settings) => {
 
@@ -255,10 +260,17 @@ sql.getDeleteList((err, deleteList) => {
             list.addDeletedItem(item.path, true)
             if (debug) utils.logDebug("[" + "INIT".cyan + "] " + "Adding " + item.path + " to deleteList")
         }
+
+
     });
 })
 
 /* ################################# End Init ################################# */
+
+
+
+
+
 
 
 // oui j'ai pris ce port wtf car c'est le tag discord de trxyy 
@@ -268,7 +280,7 @@ const port = process.env.PORT || 2332;
 console.log("[STARTING] App started on port ".brightCyan + port)
 
 http.listen(port, () => {
-    console.log(`Listening on ${port}`);
+    console.log('listening on *:3000');
 });
 
 function socketProgressEmit(event, state, fileName, i) {

@@ -1,11 +1,19 @@
-const mysql = require('mysql');
-const config = require("../config.json")
+var mysql = require('mysql');
+let config = require("../config.json")
 
-async function mysqlConnect() {
+var dbinfos = {
+    host: config.database.host,
+    port: config.database.port,
+    user: config.database.username,
+    password: config.database.password,
+    database: config.database.name,
+    charset: 'utf8mb4_bin'
+};
+
+function mysqlConnect() {
     console.log("Connexion à la bdd")
-    connection = await mysql.createConnection(config.database); // Recreate the connection, since the old one cannot be reused.
-    await connection.connect(function onConnect(err) { // The server is either down
-
+    connection = mysql.createConnection(dbinfos); // Recreate the connection, since the old one cannot be reused.
+    connection.connect(function onConnect(err) { // The server is either down
         if (err) { // or restarting (takes a while sometimes).
             console.log('error when connecting to db:', err);
             setTimeout(mysqlConnect, 10000); // We introduce a delay before attempting to reconnect,
@@ -19,16 +27,13 @@ async function mysqlConnect() {
         if (err.code == 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
             mysqlConnect(); // lost due to either server restart, or a
         } else { // connnection idle timeout (the wait_timeout
-            throw new Error("Connection idle timeout... Error -> " + err); // server variable configures this)
+            throw err; // server variable configures this)
         }
     });
 }
-mysqlConnect()
-.then( () => {
-    console.log('connection achieved successfully')
-})
-.catch(error => {
-    console.log('connection refused. Reason : ' + error);
-});
+mysqlConnect();
+
+
+
 
 module.exports = connection

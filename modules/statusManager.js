@@ -1,5 +1,9 @@
-const status = "Ok";
+let status = "Ok";
+
+const config = require('../config.json')
+const utils = require('./utils.js')
 const sql = require('./sql.js')
+let debug = config.debug;
 
 
 function getStatus() {
@@ -7,23 +11,22 @@ function getStatus() {
 }
 
 function isActive() {
-    return status === "OK" ? true : false;
+    if (status == "Ok") {
+        return true
+    } else {
+        return false
+    }
 }
 
 function setActive() {
-    sql.setNewStatus(status, (err, result) => {
-        err ? console.log('Erreur : ' + err) : null;
-        result ? console.log('Resultat : ' + result) : null;
-    });
+    status = "Ok"
+    sql.setNewStatus("Ok", (err, result) => {})
 }
 
 async function setStatus(newStatus) {
-    if (!newStatus || newStatus === "") throw new console.error("New status can't be empty");
+    if (!newStatus || newStatus == "") throw new console.error("New status can't be empty");
     status = newStatus
-    sql.setNewStatus(newStatus, (err, result) => {
-        err ? console.log('Erreur : ' + err) : null;
-        result ? console.log('Resultat : ' + result) : null;
-    })
+    sql.setNewStatus(newStatus, (err, result) => {})
 }
 
 module.exports = { getStatus, isActive, setActive, setStatus }

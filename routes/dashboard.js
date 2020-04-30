@@ -1,36 +1,36 @@
-const express = require('express');
+let express = require('express');
 const fs = require('fs')
-const router = express.Router();
+let router = express.Router();
 const passport = require('passport');
-const list = require("../modules/listManager.js")
-const status = require("../modules/statusManager.js")
-const sql = require("../modules/sql.js")
-const utils = require("../modules/utils.js")
+let list = require("../modules/listManager.js")
+let status = require("../modules/statusManager.js")
+let sql = require("../modules/sql.js")
+let utils = require("../modules/utils.js")
 const fetch = require('node-fetch');
 const unzip = require('node-unzip-2');
-const rimraf = require("rimraf");
+let rimraf = require("rimraf");
 
-const config = require("../config.json")
-const debug = config.debug
+let config = require("../config.json")
+let debug = config.debug
 
-const request = require('request');
-const progress = require('request-progress');
+let request = require('request');
+let progress = require('request-progress');
 
 
 
-router.get('/', function (req, res) {
+router.get('/', function(req, res) {
 
     if (req.session.passport == undefined) {
         res.redirect("/login")
     } else
         sql.getTodayStats((err, results) => {
 
-            const ignoredItemNumber = list.getIgnoreList().size
-            const deletedItemNumber = list.getDeleteList().size
+            let ignoredItemNumber = list.getIgnoreList().size
+            let deletedItemNumber = list.getDeleteList().size
 
             let timeAverage;
             if (!results) {
-                timeAverage = null;
+                timeAverage = None;
             } else {
 
                 let calc_times = results.map(result => result.calc_time); // extract times from query results
@@ -44,10 +44,12 @@ router.get('/', function (req, res) {
 
 
 
-});
+})
+
+
 
 /* ######################################### Begin installer ######################################### */
-router.get('/installer', async function (req, res) {
+router.get('/installer', async function(req, res) {
 
     if (req.session.passport == undefined) {
         res.redirect("/login")
@@ -83,10 +85,14 @@ router.get('/installer', async function (req, res) {
                 if (!json) return
                 res.render("install", { dllist: json, message: "", messageType: "success" })
             })
+
+
+
+
     }
 })
 
-router.post('/install', async function (req, res) {
+router.post('/install', async function(req, res) {
     if (req.session.passport == undefined) {
         res.redirect("/login")
     } else {
@@ -101,10 +107,10 @@ router.post('/install', async function (req, res) {
         res.render("download", { message: "", messageType: "error", files: response.install })
 
         let dir = './files';
-        setTimeout(function () {
+        setTimeout(function() {
 
             if (fs.existsSync(dir)) {
-                rimraf(dir, function () {
+                rimraf(dir, function() {
 
                     if (!fs.existsSync(dir)) {
                         fs.mkdirSync(dir);
@@ -112,23 +118,24 @@ router.post('/install', async function (req, res) {
 
                     // res.redirect("download")
 
+
                     response.install.forEach(file => {
 
                         progress(request(file.link), {
-                            throttle: 400, // Throttle the progress event to 2000ms, defaults to 1000ms
-                            // Only start to emit after 1000ms delay, defaults to 0ms
-                            // lengthHeader: 'x-transfer-length'  // Length header to use, defaults to content-length
-                        })
-                            .on('progress', function (state) {
+                                throttle: 400, // Throttle the progress event to 2000ms, defaults to 1000ms
+                                // Only start to emit after 1000ms delay, defaults to 0ms
+                                // lengthHeader: 'x-transfer-length'  // Length header to use, defaults to content-length
+                            })
+                            .on('progress', function(state) {
 
                                 // console.log('progress', state);
                                 main.socketProgressEmit('downloadprogress', state, file.name, file.id)
-                                // io.emit('downloadprogress', { state: state });
+                                    // io.emit('downloadprogress', { state: state });
                             })
-                            .on('error', function (err) {
+                            .on('error', function(err) {
                                 main.socketDownloadEmit('downloadAction', "postMessage", "" + err.name, file.name, file.id)
                             })
-                            .on('end', async function () {
+                            .on('end', async function() {
                                 main.socketDownloadEmit('downloadAction', "postMessage", "Download of " + file.name + " Finished", file.name, file.id);
                                 console.log(file.name + "finished with id " + file.id)
 
@@ -138,7 +145,7 @@ router.post('/install', async function (req, res) {
                                     fs.createReadStream("./" + file.path + "/" + file.name).pipe(unzip.Extract({ path: "./" + file.path }))
                                     main.socketDownloadEmit('downloadAction', "postMessage", "Deleting  " + file.name, file.name, file.id)
 
-                                    fs.unlink("./" + file.path + "/" + file.name, function (err) {
+                                    fs.unlink("./" + file.path + "/" + file.name, function(err) {
                                         if (err) throw err;
                                         // if no error, file has been deleted successfully
                                         if (debug) console.log(file.name + ' File deleted!');
@@ -184,7 +191,7 @@ router.get('/download', async function(req, res) {
 
 
 /* ######################################### Begin statusManager ######################################### */
-router.get('/manage/status', async function (req, res) {
+router.get('/manage/status', async function(req, res) {
     let actualStatus = status.getStatus()
 
 
@@ -198,32 +205,35 @@ router.get('/manage/status', async function (req, res) {
     }
 })
 
-router.post('/manage/status/edit', async function (req, res) {
-    const newStatus = req.body.reason
-    console.log(req.body)
-    if (req.session.passport == undefined) {
-        res.redirect("/login")
-    } else {
-        if (req.body.checkbox == "ok") {
-
-            console.log("Activation de la maintenance")
-            if (newStatus == undefined || newStatus == "") {
-                newStatus = "Launcher under maintenance, please retry again later"
-            }
-
-
-            status.setStatus(newStatus)
-
-            res.render("status", { status: status.getStatus(), message: "Launcher maintenance sucessfully activated", messageType: "success" })
+router.post('/manage/status/edit', async function(req, res) {
+        let actualStatus = status.getStatus()
+        let newStatus = req.body.reason
+        console.log(req.body)
+        if (req.session.passport == undefined) {
+            res.redirect("/login")
         } else {
-            console.log("Désactivation de la maintenance")
-            status.setActive()
+            if (req.body.checkbox == "ok") {
 
-            res.render("status", { status: status.getStatus(), message: "Launcher maintenance sucessfully stopped", messageType: "success" })
+                console.log("Activation de la maintenance")
+                if (newStatus == undefined || newStatus == "") {
+                    newStatus = "Launcher under maintenance, please retry again later"
+                }
+
+
+                status.setStatus(newStatus)
+
+                res.render("status", { status: status.getStatus(), message: "Launcher maintenance sucessfully activated", messageType: "success" })
+            } else {
+                console.log("Désactivation de la maintenance")
+                status.setActive()
+
+                res.render("status", { status: status.getStatus(), message: "Launcher maintenance sucessfully stopped", messageType: "success" })
+
+
+            }
         }
-    }
-})
-/* ######################################### End statusManager ######################################### */
+    })
+    /* ######################################### End statusManager ######################################### */
 
 
 
@@ -231,7 +241,7 @@ router.post('/manage/status/edit', async function (req, res) {
 
 /* ######################################### Begin ignorelist ######################################### */
 
-router.get('/manage/ignorelist', async function (req, res) {
+router.get('/manage/ignorelist', async function(req, res) {
     let ignorelist = list.getIgnoreList()
 
     console.log(ignorelist)
@@ -246,7 +256,7 @@ router.get('/manage/ignorelist', async function (req, res) {
     }
 })
 
-router.post('/manage/ignorelist/delete', async function (req, res) {
+router.post('/manage/ignorelist/delete', async function(req, res) {
     let ignorelist = list.getIgnoreList()
 
     if (req.session.passport == undefined) {
@@ -274,8 +284,10 @@ router.post('/manage/ignorelist/delete', async function (req, res) {
 
 })
 
-router.post('/manage/ignorelist/add', async function (req, res) {
-    const ignorelist = list.getIgnoreList()
+router.post('/manage/ignorelist/add', async function(req, res) {
+
+
+    let ignorelist = list.getIgnoreList()
 
     if (req.session.passport == undefined) {
         res.redirect("/login")
@@ -302,7 +314,7 @@ router.post('/manage/ignorelist/add', async function (req, res) {
 
 })
 
-router.post('/manage/ignorelist/edit', async function (req, res) {
+router.post('/manage/ignorelist/edit', async function(req, res) {
 
     let ignorelist = list.getIgnoreList()
 
@@ -332,7 +344,7 @@ router.post('/manage/ignorelist/edit', async function (req, res) {
     }
 })
 
-router.post('/manage/ignorelist/export', function (req, res) {
+router.post('/manage/ignorelist/export', function(req, res) {
     let ignoreList = list.getIgnoreList()
 
     if (req.session.passport == undefined) {
@@ -345,6 +357,9 @@ router.post('/manage/ignorelist/export', function (req, res) {
             console.log(item)
 
             builder = item + "\n" + builder
+
+
+
         }
         res.setHeader('Content-disposition', 'attachment; filename=' + "ignore.cfg");
         res.set('Content-Type', 'text/cfg');
@@ -353,7 +368,7 @@ router.post('/manage/ignorelist/export', function (req, res) {
     }
 })
 
-router.post('/manage/ignorelist/import', function (req, res) {
+router.post('/manage/ignorelist/import', function(req, res) {
     if (req.session.passport == undefined) {
         res.redirect("/login")
 
@@ -411,8 +426,8 @@ router.post('/manage/ignorelist/import', function (req, res) {
 
 /* ######################################### Begin deletelist ######################################### */
 
-router.get('/manage/deletelist', async function (req, res) {
-    const deletelist = list.getDeleteList()
+router.get('/manage/deletelist', async function(req, res) {
+    let deletelist = list.getDeleteList()
 
 
     if (req.session.passport == undefined) {
@@ -424,8 +439,8 @@ router.get('/manage/deletelist', async function (req, res) {
     }
 })
 
-router.post('/manage/deletelist/delete', async function (req, res) {
-    const deletelist = list.getDeleteList()
+router.post('/manage/deletelist/delete', async function(req, res) {
+    let deletelist = list.getDeleteList()
 
     if (req.session.passport == undefined) {
         res.redirect("/login")
@@ -452,10 +467,10 @@ router.post('/manage/deletelist/delete', async function (req, res) {
 
 })
 
-router.post('/manage/deletelist/add', async function (req, res) {
+router.post('/manage/deletelist/add', async function(req, res) {
 
 
-    const deletelist = list.getDeleteList()
+    let deletelist = list.getDeleteList()
 
     if (req.session.passport == undefined) {
         res.redirect("/login")
@@ -482,9 +497,9 @@ router.post('/manage/deletelist/add', async function (req, res) {
 
 })
 
-router.post('/manage/deletelist/edit', async function (req, res) {
+router.post('/manage/deletelist/edit', async function(req, res) {
 
-    const deletelist = list.getDeleteList()
+    let deletelist = list.getDeleteList()
 
     if (req.session.passport == undefined) {
         res.redirect("/login")
@@ -512,8 +527,8 @@ router.post('/manage/deletelist/edit', async function (req, res) {
     }
 })
 
-router.post('/manage/deletelist/export', function (req, res) {
-    const deletelist = list.getDeleteList()
+router.post('/manage/deletelist/export', function(req, res) {
+    let deletelist = list.getDeleteList()
 
     if (req.session.passport == undefined) {
         res.redirect("/login")
@@ -525,6 +540,9 @@ router.post('/manage/deletelist/export', function (req, res) {
             console.log(item)
 
             builder = item + "\n" + builder
+
+
+
         }
         res.setHeader('Content-disposition', 'attachment; filename=' + "delete.cfg");
         res.set('Content-Type', 'text/cfg');
@@ -533,7 +551,7 @@ router.post('/manage/deletelist/export', function (req, res) {
     }
 })
 
-router.post('/manage/deletelist/import', function (req, res) {
+router.post('/manage/deletelist/import', function(req, res) {
     if (req.session.passport == undefined) {
         res.redirect("/login")
 
@@ -575,6 +593,12 @@ router.post('/manage/deletelist/import', function (req, res) {
         } else {
             return res.render("list", { list: deletelist, type: "delete", message: "Please upload a file with valid extension", messageType: "error" });
         }
+
+
+
+
+
+
     }
 })
 
