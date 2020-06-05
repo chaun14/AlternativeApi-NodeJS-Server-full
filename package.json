@@ -4,6 +4,7 @@
     "description": "AlternativeApi NodeJS download Server full",
     "main": "app.js",
     "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
         "start": "node app.js"
     },
     "repository": {
@@ -27,6 +28,7 @@
     "dependencies": {
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.19.0",
+        "chokidar": "^3.4.0",
         "colors": "^1.4.0",
         "cookie-parser": "^1.4.5",
         "ejs": "^3.1.2",
